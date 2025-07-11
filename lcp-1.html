@@ -2,117 +2,68 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Listener Dependency LCP Test</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        max-width: 600px;
-        margin: 4rem auto;
-        padding: 1rem;
-        line-height: 1.5;
-      }
-    </style>
+    <title>LCP Test: Fetch Delay</title>
     <script>
       (function () {
-        const getConfigFromUrl = () => {
-          const params = new URLSearchParams(window.location.search);
-          return {
-            timeoutMs: parseInt(params.get("timeoutMs")) || 1000,
-            fetchCount: parseInt(params.get("fetchCount")) || 5,
-            exitEarly: params.get("exitEarly") === "true",
-            noHide: params.get("noHide") === "true",
-            sequential: params.get("sequential") === "true", // otherwise: parallel
-            fetchUrl:
-              params.get("fetchUrl") ||
-              "https://edge.cofra.me/?config=%257B%2522projectId%2522%253A%252267eef89169343b193adabcd3%2522%252C%2522startTime%2522%253A1752256578640%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Fthrivemarket.com%252F%2522%252C%2522waitForHydration%2522%253Atrue%257D",
-          };
-        };
-
-        const config = getConfigFromUrl();
-        console.log("Loaded config from URL:", config);
-
-        if (config.exitEarly) {
-          console.log("Exiting early due to config.exitEarly");
-          return;
+        if (/exitEarly=true/.test(window.location.search)) {
+          return console.warn("[LCP Test] Exit early via URL parameter");
         }
+
+        const params = new URLSearchParams(window.location.search);
+        const fetchCount = parseInt(params.get("fetchCount")) || 5;
+        const timeoutMs = parseInt(params.get("timeoutMs")) || 1000;
+        const fetchUrl =
+          "https://edge.cofra.me/?config=%257B%2522projectId%2522%253A%252267eef89169343b193adabcd3%2522%252C%2522startTime%2522%253A1752256578640%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Fthrivemarket.com%252F%2522%252C%2522waitForHydration%2522%253Atrue%257D";
 
         const style = document.createElement("style");
         style.innerHTML = "body { opacity: 0 !important; }";
-
-        const hide = () => {
-          if (!config.noHide) {
-            console.log("Applying hide");
-            document.head.appendChild(style);
-          } else {
-            console.log("Skipping hide due to config.noHide");
-          }
-        };
+        document.head.appendChild(style);
 
         const show = () => {
-          if (!config.noHide) {
-            style.remove();
-          }
-          console.log("Showing content");
+          style.remove();
+          console.log("[LCP Test] Showing content");
         };
 
-        hide();
-
-        // Early listener registration
         document.addEventListener("onShow", show);
 
-        // Fallback timeout
         setTimeout(() => {
-          console.log("Timeout reached, showing content");
+          console.log("[LCP Test] Timeout reached");
           show();
-        }, config.timeoutMs);
+        }, timeoutMs);
 
-        const runSequentialFetches = async (count) => {
-          try {
-            for (let i = 0; i < count; i++) {
-              console.log(`Fetching ${i + 1}/${count}`);
-              await fetch(config.fetchUrl);
-            }
-            console.log("All sequential fetches done. Dispatching onShow");
-            document.dispatchEvent(new Event("onShow"));
-          } catch (e) {
-            console.error("Error during fetches, showing anyway", e);
-            show();
-          }
-        };
-
-        const runParallelFetches = async (count) => {
+        const runParallelFetches = async () => {
           try {
             const fetches = [];
-            for (let i = 0; i < count; i++) {
-              console.log(`Queuing fetch ${i + 1}/${count}`);
-              fetches.push(fetch(config.fetchUrl));
+            for (let i = 0; i < fetchCount; i++) {
+              console.log(`Queuing fetch ${i + 1}/${fetchCount}`);
+              fetches.push(fetch(fetchUrl));
             }
             await Promise.all(fetches);
-            console.log("All parallel fetches done. Dispatching onShow");
+            console.log("[LCP Test] All fetches done. Dispatching onShow");
             document.dispatchEvent(new Event("onShow"));
           } catch (e) {
-            console.error("Error during parallel fetches, showing anyway", e);
+            console.error("[LCP Test] Fetch error, showing anyway", e);
             show();
           }
         };
 
-        if (config.sequential) {
-          runSequentialFetches(config.fetchCount);
-        } else {
-          runParallelFetches(config.fetchCount);
-        }
+        runParallelFetches();
       })();
     </script>
   </head>
-  <body>
-    <h1>✅ Demo: onShow Event</h1>
+  <body style="font-family: sans-serif; max-width: 600px; margin: 4rem auto; padding: 1rem; line-height: 1.5;">
+    <h1>✅ Demo: LCP Fetch Simulation</h1>
     <p>
-      The page stays hidden until the <code>onShow</code> event fires, which
-      occurs after a 1s timeout or all fetches finish (sequential or parallel).
+      The page stays hidden until the <code>onShow</code> event fires, which occurs after a timeout or all fetches finished.
+      <br />
+      Timeout should control LCP max impact, but simulated LCP is growing with fetch count.
     </p>
-    <p>
-      <strong>Control via URL:</strong><br />
-      <code>?fetchCount=3&timeoutMs=2000&noHide=true&exitEarly=false&sequential=true</code>
-    </p>
+    <h2>Example URLs</h2>
+    <ul>
+      <li><a href="/lcp-test/lcp-1?exitEarly=true">/lcp-test/lcp-1?exitEarly=true</a></li>
+      <li><a href="/lcp-test/lcp-1?fetchCount=5">/lcp-test/lcp-1?fetchCount=5</a></li>
+      <li><a href="/lcp-test/lcp-1?fetchCount=10">/lcp-test/lcp-1?fetchCount=10</a></li>
+      <li><a href="/lcp-test/lcp-1?fetchCount=40">/lcp-test/lcp-1?fetchCount=40</a></li>
+    </ul>
   </body>
 </html>
