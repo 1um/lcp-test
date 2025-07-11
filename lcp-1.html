@@ -68,12 +68,12 @@
       More fetches simulate heavier load and may increase the estimated LCP.
     </p>
     <p>
-      <strong>The timeout is meant to cap LCP growth</strong>, but when running with simulated throttling (like in Lighthouse),
-      the estimated LCP still increases as fetch count grows.
+      <strong>The timeout is meant to cap LCP growth</strong>, but when running Lighthouse with its <em>default simulated throttling</em>, the estimated LCP increases as the fetch count grows.
     </p>
     <p>
-      However, if you throttle using Chrome DevTools manually, LCP may not grow as expected — this makes the test helpful for comparing both methods.
+      However, when using Lighthouse with <em>DevTools-based throttling</em>, LCP behaves as expected and does <strong>not</strong> grow with fetch count.
     </p>
+
 
     <h2>Example URLs</h2>
     <ul>
