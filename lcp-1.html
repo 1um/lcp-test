@@ -29,7 +29,13 @@
 
         // Early listener registration
         document.addEventListener("onShow", show);
-
+      
+        // Fallback timeout
+        setTimeout(() => {
+          console.log("Timeout reached, showing content");
+          show();
+        }, config.timeoutMs);
+        
         // Sequential fetcher
         const runSequentialFetches = async (count) => {
           try {
