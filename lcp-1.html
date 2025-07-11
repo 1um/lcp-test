@@ -15,7 +15,7 @@
     <script>
       (function () {
         config = {
-          timeoutMs: 1000,
+          timeoutMs: 0,
         };
 
         const style = document.createElement("style");
@@ -24,7 +24,6 @@
         const show = () => style.remove();
         hide();
         setTimeout(() => {
-          console.log("timeout show");
           show();
         }, config.timeoutMs);
 
