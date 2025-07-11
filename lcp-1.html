@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Listener Dependency LCP Test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        max-width: 600px;
+        margin: 4rem auto;
+        padding: 1rem;
+        line-height: 1.5;
+      }
+    </style>
+    <script>
+      (function () {
+        config = {
+          timeoutMs: 1000,
+        };
+
+        const style = document.createElement("style");
+        style.innerHTML = "body { opacity: 0 !important; }";
+        const hide = () => document.head.appendChild(style);
+        const show = () => style.remove();
+        hide();
+        setTimeout(() => {
+          console.log("showing due to timeout");
+          show();
+        }, config.timeoutMs);
+
+        // Early listener registration
+        document.addEventListener("onShow", show);
+
+        // Load delayed script (~1s)
+        fetch("https://httpbin.org/delay/" + config.timeoutMs / 1000 / 3)
+          .then(() => {
+            console.log("fetch done");
+            document.dispatchEvent(new Event("onShow"));
+          })
+          .catch((e) => {
+            console.error("fetch error, showing anyway", e);
+            show();
+          });
+      })();
+    </script>
+  </head>
+  <body>
+    <h1>✅ Demo: onShow Event</h1>
+    <p>
+      The page stays hidden until the <code>onShow</code> event fires, which
+      occurs after a 1s timeout or 3d party script finishes loading.
+    </p>
+  </body>
+</html>
