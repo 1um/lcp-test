@@ -13,7 +13,7 @@
         const fetchCount = parseInt(params.get("fetchCount")) || 5;
         const timeoutMs = parseInt(params.get("timeoutMs")) || 1000;
         const fetchUrl =
-          "https://edge.cofra.me/?config=%257B%2522projectId%2522%253A%252267eef89169343b193adabcd3%2522%252C%2522startTime%2522%253A1752256578640%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Fthrivemarket.com%252F%2522%252C%2522waitForHydration%2522%253Atrue%257D";
+          "https://index.commoncrawl.org/CC-MAIN-2025-26-index?url=https://developer.chrome.com/docs/lighthouse/overview/&output=json";
 
         const style = document.createElement("style");
         style.innerHTML = "body { opacity: 0 !important; }";
@@ -51,13 +51,30 @@
       })();
     </script>
   </head>
-  <body style="font-family: sans-serif; max-width: 600px; margin: 4rem auto; padding: 1rem; line-height: 1.5;">
-    <h1>✅ Demo: LCP Fetch Simulation</h1>
+  <body style="font-family: sans-serif; max-width: 600px; margin: 4rem auto; padding: 1rem; line-height: 1.6;">
+    <h1>✅ LCP Fetch Simulation Test</h1>
     <p>
-      The page stays hidden until the <code>onShow</code> event fires, which occurs after a timeout or all fetches finished.
-      <br />
-      Timeout should control LCP max impact, but simulated LCP is growing with fetch count.
+      This page stays hidden until the <code>onShow</code> event is triggered.
     </p>
+    <p>
+      The event fires after either:
+      <ul>
+        <li>A timeout (<strong>default: 1000ms</strong>), or</li>
+        <li>All background fetch requests have completed.</li>
+      </ul>
+    </p>
+    <p>
+      You can control the number of parallel fetches using the <code>fetchCount</code> parameter.
+      More fetches simulate heavier load and may increase the estimated LCP.
+    </p>
+    <p>
+      <strong>The timeout is meant to cap LCP growth</strong>, but when running with simulated throttling (like in Lighthouse),
+      the estimated LCP still increases as fetch count grows.
+    </p>
+    <p>
+      However, if you throttle using Chrome DevTools manually, LCP may not grow as expected — this makes the test helpful for comparing both methods.
+    </p>
+
     <h2>Example URLs</h2>
     <ul>
       <li><a href="/lcp-test/lcp-1?exitEarly=true">/lcp-test/lcp-1?exitEarly=true</a></li>
