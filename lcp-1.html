@@ -13,7 +13,7 @@
         const fetchCount = parseInt(params.get("fetchCount")) || 5;
         const timeoutMs = parseInt(params.get("timeoutMs")) || 1000;
         const fetchUrl =
-          "https://jsonplaceholder.typicode.com/posts";
+          "https://jsonplaceholder.typicode.com/comments?postId=";
 
         const style = document.createElement("style");
         style.innerHTML = "body { opacity: 0 !important; }";
@@ -35,8 +35,9 @@
           try {
             const fetches = [];
             for (let i = 0; i < fetchCount; i++) {
-              console.log(`Queuing fetch ${i + 1}/${fetchCount}`);
-              fetches.push(fetch(fetchUrl));
+              const url = `${fetchUrl}${i + 1}`;
+              console.log(`Fetching ${url}`);
+              fetches.push(fetch(url));
             }
             await Promise.all(fetches);
             console.log("[LCP Test] All fetches done. Dispatching onShow");
@@ -46,7 +47,7 @@
             show();
           }
         };
-
+        
         runParallelFetches();
       })();
     </script>
