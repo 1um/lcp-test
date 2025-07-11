@@ -14,8 +14,11 @@
     </style>
     <script>
       (function () {
-        config = {
+        const config = {
           timeoutMs: 0,
+          fetchCount: 5, // set how many times to fetch sequentially
+          fetchUrl:
+            "https://edge.cofra.me/?config=%257B%2522projectId%2522%253A%252267eef89169343b193adabcd3%2522%252C%2522startTime%2522%253A1752256578640%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Fthrivemarket.com%252F%2522%252C%2522waitForHydration%2522%253Atrue%257D",
         };
 
         const style = document.createElement("style");
@@ -23,23 +26,27 @@
         const hide = () => document.head.appendChild(style);
         const show = () => style.remove();
         hide();
-        setTimeout(() => {
-          show();
-        }, config.timeoutMs);
 
         // Early listener registration
         document.addEventListener("onShow", show);
 
-        // Load delayed script (~1s)
-        fetch("https://edge.cofra.me/?config=%257B%2522projectId%2522%253A%252267eef89169343b193adabcd3%2522%252C%2522startTime%2522%253A1752256578640%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Fthrivemarket.com%252F%2522%252C%2522waitForHydration%2522%253Atrue%257D")
-          .then(() => {
-            console.log("fetch done, showing content.");
+        // Sequential fetcher
+        const runSequentialFetches = async (count) => {
+          try {
+            for (let i = 0; i < count; i++) {
+              console.log(`Fetching ${i + 1}/${count}`);
+              await fetch(config.fetchUrl);
+            }
+            console.log("All fetches done. Dispatching onShow");
             document.dispatchEvent(new Event("onShow"));
-          })
-          .catch((e) => {
-            console.error("fetch error, showing anyway", e);
+          } catch (e) {
+            console.error("Error during fetches, showing anyway", e);
             show();
-          });
+          }
+        };
+
+        // Run it
+        runSequentialFetches(config.fetchCount);
       })();
     </script>
   </head>
