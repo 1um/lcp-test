@@ -5,7 +5,7 @@
     <title>LCP Test: Fetch Delay</title>
     <script>
       (function () {
-        if (/exitEarly=true/.test(window.location.search)) {
+        if (/exitEarly/.test(window.location.search)) {
           return console.warn("[LCP Test] Exit early via URL parameter");
         }
 
