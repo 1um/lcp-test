@@ -51,8 +51,25 @@
           }
         };
 
+
+        const runParallelFetches = async (count) => {
+          try {
+            const fetches = [];
+            for (let i = 0; i < count; i++) {
+              console.log(`Queuing fetch ${i + 1}/${count}`);
+              fetches.push(fetch(config.fetchUrl));
+            }
+            await Promise.all(fetches);
+            console.log("All parallel fetches done. Dispatching onShow");
+            document.dispatchEvent(new Event("onShow"));
+          } catch (e) {
+            console.error("Error during parallel fetches, showing anyway", e);
+            show();
+          }
+        };
+
         // Run it
-        runSequentialFetches(config.fetchCount);
+        runParallelFetches(config.fetchCount);
       })();
     </script>
   </head>
