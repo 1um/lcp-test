@@ -24,7 +24,7 @@
         const show = () => style.remove();
         hide();
         setTimeout(() => {
-          console.log("showing due to timeout");
+          console.log("timeout show");
           show();
         }, config.timeoutMs);
 
@@ -34,7 +34,7 @@
         // Load delayed script (~1s)
         fetch("https://httpbin.org/delay/" + config.timeoutMs / 1000 / 3)
           .then(() => {
-            console.log("fetch done");
+            console.log("fetch done, showing content.");
             document.dispatchEvent(new Event("onShow"));
           })
           .catch((e) => {
