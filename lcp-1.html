@@ -32,7 +32,7 @@
         document.addEventListener("onShow", show);
 
         // Load delayed script (~1s)
-        fetch("https://httpbin.org/delay/" + config.timeoutMs / 1000 / 3)
+        fetch("https://httpbin.org/delay/" + config.timeoutMs / 1000 / 4)
           .then(() => {
             console.log("fetch done, showing content.");
             document.dispatchEvent(new Event("onShow"));
